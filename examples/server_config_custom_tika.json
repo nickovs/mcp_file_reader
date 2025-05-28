@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "mcp-file-reader": {
+      "command": "mcp-file-reader",
+      "env": {
+        "TIKA_URL": "http://localhost:9998"
+      }
+    }
+  }
+}

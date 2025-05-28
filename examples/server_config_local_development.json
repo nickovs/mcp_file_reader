@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mcp-file-reader": {
+      "command": "python",
+      "args": ["/path/to/mcp_file_reader/src/mcp_file_reader/__init__.py"]
+    }
+  }
+}

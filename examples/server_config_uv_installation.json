@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "mcp-file-reader": {
+      "command": "mcp-file-reader"
+    }
+  }
+}
