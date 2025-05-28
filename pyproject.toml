@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcp-file-reader"
-version = "0.2.1"
+version = "0.2.2"
 description = "A Model Context Protocol (MCP) service that extracts text content from files using Apache Tika"
 readme = "README.md"
 license = "MIT"
@@ -40,9 +40,9 @@ dev = [
 mcp-file-reader = "mcp_file_reader:main_sync"
 
 [project.urls]
-Homepage = "https://github.com/nickovs/mcp-file-reader"
-Repository = "https://github.com/nickovs/mcp-file-reader"
-Issues = "https://github.com/nickovs/mcp-file-reader/issues"
+Homepage = "https://github.com/nickovs/mcp_file_reader"
+Repository = "https://github.com/nickovs/mcp_file_reader"
+Issues = "https://github.com/nickovs/mcp_file_reader/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
