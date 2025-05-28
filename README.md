@@ -13,95 +13,81 @@ A Model Context Protocol (MCP) service that extracts text content from files usi
 - **Environment Configuration**: Configurable Tika server endpoint and allowed directories
 - **Error Handling**: Comprehensive error handling for missing files, network issues, etc.
 
-## Installation
+## Installation and usage
 
-### Using uv (Recommended)
+Since this package is designed to be used as an MCP service, it is typically installed by
+inserting an entry into the configuration of your MCP client. The examples below are for
+the `claude_desktop_confoig.json` settings for the Claude Desktop app, but the general content
+of the settings should be the same for other applications.
 
-```bash
-# Install the package
-uv pip install .
+### Using uvx (Recommended)
 
-# Or install directly from the repository
-uv pip install git+https://github.com/your-org/mcp-file-reader.git
+Insert the `"file-reader"` stanza below into your `mcpServers` configuration:
+
+```json
+{
+  "mcpServers": {
+    "file-reader": {
+      "command": "uvx",
+      "args": [
+        "mcp-file-reader",
+        "/Users/your_name/Desktop",
+        "/Users/your_name/Downloads",
+        "/Users/your_name/other_accessible_directory"
+      ]
+    }
+  }
+}
 ```
 
-### Using pip
+### Running from a local development copy
 
+Check out the latest source using:
 ```bash
-# Install the package
-pip install .
-
-# Or install in development mode
-pip install -e .
+cd /Users/your_name/source_path
+git clone https://github.com/nickovs/mcp_file_reader.git
 ```
 
-## Usage
+Then insert the `"file-reader"` stanza below into your `mcpServers` configuration:
 
-### Quick Start
-
-The service automatically manages Tika for you. Simply run:
-
-```bash
-mcp-file-reader
+```json
+{
+  "mcpServers": {
+    "file-reader": {
+      "command": "uvx",
+      "args": [
+        "--refresh",
+        "--from",
+        "/Users/your_name/source_path/mcp_file_reader",
+        "mcp-file-reader",
+        "/Users/your_name/Desktop",
+        "/Users/your_name/Downloads",
+        "/Users/your_name/other_accessible_directory"
+      ]
+    }
+  }
+}
 ```
 
-The service will:
-1. Check if Tika is already running on localhost:9998
-2. If not found, automatically start a Tika Docker container
-3. Begin accepting MCP requests
 
-### Manual Tika Configuration
+## Manual Tika Configuration
 
 If you prefer to manage Tika yourself, set the `TIKA_URL` environment variable:
 
-```bash
-# Start your own Tika server
-docker run -p 9998:9998 apache/tika:latest-full
-
-# Run the MCP service with custom Tika URL
-export TIKA_URL=http://localhost:9998
-mcp-file-reader
-```
-
-## MCP Client Configuration
-
-To use this service with an MCP-enabled client (like Claude Desktop), add the following to your `server_config.json`:
-
-### Basic Configuration
-
 ```json
 {
-  "servers": {
-    "mcp-file-reader": {
-      "command": "mcp-file-reader"
-    }
-  }
-}
-```
-
-### With Custom Tika URL
-
-```json
-{
-  "servers": {
-    "mcp-file-reader": {
-      "command": "mcp-file-reader",
+  "mcpServers": {
+    "file-reader": {
+      "command": "uvx",
       "env": {
-        "TIKA_URL": "http://localhost:9998"
-      }
-    }
-  }
-}
-```
-
-### Development Configuration
-
-```json
-{
-  "servers": {
-    "mcp-file-reader": {
-      "command": "python",
-      "args": ["/path/to/mcp_file_reader/src/mcp_file_reader.py"]
+        "TIKA_URL": "http://some.tika.server:9998"
+      },
+      "args": [
+        "mcp-file-reader",
+        "/Users/your_name/Desktop",
+        "/Users/your_name/Downloads",
+        "/Users/your_name/other_accessible_directory"
+      ]
     }
   }
 }
@@ -171,14 +157,8 @@ Thanks to Apache Tika, this service supports:
 # Single directory
 export MCP_ALLOWED_DIRECTORIES="/Users/yourname/Documents"
 
-# Multiple directories (colon-separated on Unix)
-export MCP_ALLOWED_DIRECTORIES="/Users/yourname/Documents:/Users/yourname/Downloads"
-
-# Multiple directories (semicolon-separated)
-export MCP_ALLOWED_DIRECTORIES="/Users/yourname/Documents;/Users/yourname/Downloads"
-
-# Multiple directories (comma-separated)
-export MCP_ALLOWED_DIRECTORIES="/Users/yourname/Documents,/Users/yourname/Downloads"
+# Multiple directories, space separated
+export MCP_ALLOWED_DIRECTORIES="/Users/yourname/Documents /Users/yourname/Downloads"
 ```
 
 ### Security Model
@@ -201,7 +181,7 @@ The service implements directory-based access control:
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/nickovs/mcp_file_reader.git
    cd mcp_file_reader
    ```
 
@@ -211,9 +191,8 @@ The service implements directory-based access control:
    ```
 
 3. **Run the service**:
-   ```bash
-   python src/mcp_file_reader.py
-   ```
+   See the [example above](#running-from-a-local-development-copy) for running the code from 
+   a local development copy.
 
 ### Testing
 
@@ -224,82 +203,5 @@ Run the test suite:
 uv pip install ".[dev]"
 
 # Run tests
-pytest tests/ -v
+./run_tests.sh
 ```
-
-### Manual Testing
-
-```bash
-# Test the service
-python scripts/simple_mcp_test.py
-```
-
-## How It Works
-
-1. **Automatic Tika Management**: When started, the service checks if Tika is running on the default port (9998)
-2. **Auto-Start**: If no Tika server is found and no `TIKA_URL` is provided, it automatically starts a Tika Docker container
-3. **File Processing**: When a file read request comes in, it sends the file to Tika for text extraction
-4. **Clean Shutdown**: When the service stops, it automatically shuts down any Tika containers it started
-
-## Error Handling
-
-The service handles various error conditions:
-- **File not found**: Returns clear error message
-- **Path is directory**: Validates that path points to a file
-- **Tika server errors**: Handles and reports Tika service failures
-- **Network timeouts**: 30-second timeout for Tika requests
-- **Permission errors**: Reports file access permission issues
-- **Docker errors**: Reports issues starting Tika container
-
-## Security Considerations
-
-- No file modification or deletion capabilities
-- Service only reads files from the local filesystem
-- Automatically manages Tika server lifecycle for security
-- Ensure Docker is properly secured in production environments
-
-## Troubleshooting
-
-### Common Issues
-
-1. **"Docker not found" errors**:
-   - Ensure Docker is installed and running
-   - Check that `docker` command is available in PATH
-   - Try providing a custom `TIKA_URL` to use external Tika
-
-2. **"File not found" errors**:
-   - Ensure files exist at the specified absolute path
-   - Verify file permissions are readable by the service
-
-3. **Tika connection errors**:
-   - Check that port 9998 is available for automatic Tika startup
-   - Verify Docker has permission to bind to ports
-   - Try using a custom `TIKA_URL` with external Tika
-
-4. **MCP communication issues**:
-   - Ensure no extra output is being sent to stdout (service logs to stderr)
-   - Check that the MCP client is using the correct configuration
-
-### Logs
-
-The service logs to stderr to avoid interfering with MCP stdio communication:
-
-```bash
-# View logs while running
-mcp-file-reader 2> mcp-file-reader.log
-
-# Or redirect stderr to see logs
-python src/mcp_file_reader.py 2>&1 | grep -v "^{"
-```
-
-## License
-
-This project is open source. Please check individual dependencies for their respective licenses.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Ensure all tests pass
-5. Submit a pull request

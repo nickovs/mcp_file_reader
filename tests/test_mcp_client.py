@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025 Nicko van Someren
+# SPDX-License-Identifier: MIT
+
 """
 MCP File Reader Service Test Client
 

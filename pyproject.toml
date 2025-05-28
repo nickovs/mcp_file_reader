@@ -4,17 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcp-file-reader"
-version = "0.2.0"
+version = "0.2.1"
 description = "A Model Context Protocol (MCP) service that extracts text content from files using Apache Tika"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
-    {name = "MCP File Reader Contributors"}
+    {name = "Nicko van Someren"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -42,11 +41,17 @@ mcp-file-reader = "mcp_file_reader:main_sync"
 
 [project.urls]
 Homepage = "https://github.com/nickovs/mcp-file-reader"
-Repository = "https://github.com/your-org/mcp-file-reader"
-Issues = "https://github.com/your-org/mcp-file-reader/issues"
+Repository = "https://github.com/nickovs/mcp-file-reader"
+Issues = "https://github.com/nickovs/mcp-file-reader/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-dir]
 "" = "src"
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/project/"
+explicit = true
